@@ -15,17 +15,12 @@
  ******************************************************************************/
 package com.comcast.freeflow.layouts;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import android.graphics.Rect;
 import com.comcast.freeflow.core.FreeFlowItem;
 import com.comcast.freeflow.core.Section;
-import com.comcast.freeflow.core.SectionedAdapter;
-import com.comcast.freeflow.layouts.FreeFlowLayout.FreeFlowLayoutParams;
-import com.comcast.freeflow.layouts.VGridLayout.LayoutParams;
 import com.comcast.freeflow.utils.ViewUtils;
-
-import android.graphics.Rect;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 
@@ -37,6 +32,20 @@ public class HGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 	private int headerHeight = -1;
 	private int cellBufferSize = 0;
 	private int bufferCount = 1;
+
+  /**
+   * Setting itemFrameInsetX and itemFrameInsetY shrinks the computed frames
+   * of the layout by the values specified. Use this to create gaps between
+   * the items laid out by this class
+   */
+  public int itemFrameInsetX = 0;
+
+  /**
+   * Setting itemFrameInsetX and itemFrameInsetY shrinks the computed frames
+   * of the layout by the values specified. Use this to create gaps between
+   * the items laid out by this class
+   */
+  public int itemFrameInsetY = 0;
 	
 	protected FreeFlowLayoutParams layoutParams;
 	
@@ -90,6 +99,9 @@ public class HGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 				frame.top = (j % rows) * itemHeight;
 				frame.right = frame.left + itemWidth;
 				frame.bottom = frame.top + itemHeight;
+
+        frame.inset(itemFrameInsetX, itemFrameInsetY);
+
 				descriptor.frame = frame;
 				descriptor.data = s.getDataAtIndex(j);
 				proxies.put(descriptor.data, descriptor);
