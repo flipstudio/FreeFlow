@@ -13,32 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+
 package com.comcast.freeflow.utils;
 
-import java.util.Map;
+public class MathUtils {
 
-import android.content.Context;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-
-import com.comcast.freeflow.core.FreeFlowItem;
-
-public class ViewUtils {
-	public static FreeFlowItem getItemAt(Map<?, FreeFlowItem> frameDescriptors, int x, int y){
-        FreeFlowItem returnValue = null;
-
-		for(FreeFlowItem item : frameDescriptors.values()) {
-			if(item.frame.contains((int)x, (int)y)) {
-                returnValue =  item;
-            }
-	      
-	    }
-		return returnValue;
+	public static int randRange(int min, int max) {
+		return min + (int) (Math.random() * ((max - min) + 1));
 	}
-	
-	public static float dipToPixels(Context context, float dipValue) {
-	    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-	    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
-	}
-	
+
 }

@@ -27,13 +27,13 @@ import com.comcast.freeflow.utils.ViewUtils;
 public class HLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 
 	private static final String TAG = "HLayout";
-	private int itemWidth = -1;
-	private Map<Object, FreeFlowItem> proxies = new HashMap<Object, FreeFlowItem>();
-	private int headerHeight = -1;
-	private int headerWidth = -1;
+	protected int itemWidth = -1;
+	protected Map<Object, FreeFlowItem> proxies = new HashMap<Object, FreeFlowItem>();
+	protected int headerHeight = -1;
+	protected int headerWidth = -1;
 
-	private int cellBufferSize = 0;
-	private int bufferCount = 1;
+	protected int cellBufferSize = 0;
+	protected int bufferCount = 1;
 	
 	protected FreeFlowLayoutParams layoutParams;
 	
@@ -147,8 +147,9 @@ public class HLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 
 	@Override
 	public int getContentWidth() {
-		if (itemsAdapter == null)
+		if (itemsAdapter == null || itemsAdapter.getNumberOfSections() <= 0){
 			return 0;
+		}
 
 		int sectionIndex = itemsAdapter.getNumberOfSections() - 1;
 		Section s = itemsAdapter.getSection(sectionIndex);
