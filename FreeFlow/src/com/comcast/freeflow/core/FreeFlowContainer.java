@@ -16,7 +16,7 @@
 package com.comcast.freeflow.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -39,6 +39,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.EdgeEffect;
 import android.widget.OverScroller;
@@ -200,7 +201,7 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 	protected void init(Context context) {
 
 		viewpool = new ViewPool();
-		frames = new HashMap<Object, FreeFlowItem>();
+		frames = new LinkedHashMap<Object, FreeFlowItem>();
 
 		ViewConfiguration configuration = ViewConfiguration.get(context);
 		maxFlingVelocity = configuration.getScaledMaximumFlingVelocity();
@@ -222,15 +223,17 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 
 		int beforeWidth = getWidth();
 		int beforeHeight = getHeight();
-		
+
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		int afterWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int afterHeight = MeasureSpec.getSize(heightMeasureSpec);
-		
-		// TODO: prepareLayout should at some point take sizeChanged as a param to not
+
+		// TODO: prepareLayout should at some point take sizeChanged as a param
+		// to not
 		// avoidable calculations
-		boolean sizeChanged = (beforeHeight == afterHeight) && (beforeWidth == afterWidth);
-		
+		boolean sizeChanged = (beforeHeight == afterHeight)
+				&& (beforeWidth == afterWidth);
+
 		if (this.mLayout != null) {
 			mLayout.setDimensions(afterWidth, afterHeight);
 		}
@@ -245,14 +248,51 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 			computeLayout(afterWidth, afterHeight);
 		}
 
+		if (dataSetChanged) {
+			dataSetChanged = false;
+			for (FreeFlowItem item : frames.values()) {
+				if (item.itemIndex >= 0 && item.itemSection >= 0) {
+					mAdapter.getItemView(item.itemSection, item.itemIndex,
+							item.view, this);
+				}
+			}
+		}
+
 	}
 
+	protected boolean dataSetChanged = false;
+
+	/**
+	 * Notifies the attached observers that the underlying data has been changed
+	 * and any View reflecting the data set should refresh itself.
+	 */
+	public void notifyDataSetChanged() {
+		dataSetChanged = true;
+		requestLayout();
+	}
+
+	/**
+	 * @deprecated Use dataInvalidated(boolean shouldRecalculateScrollPositions)
+	 *             instead
+	 */
 	public void dataInvalidated() {
+		dataInvalidated(false);
+	}
+
+	/**
+	 * Called to inform the Container that the underlying data on the adapter
+	 * has changed (more items added/removed). Note that this won't update the
+	 * views if the adapter's data objects are the same but the values in those
+	 * objects have changed. To update those call {@code notifyDataSetChanged}
+	 * 
+	 * @param shouldRecalculateScrollPositions
+	 */
+	public void dataInvalidated(boolean shouldRecalculateScrollPositions) {
 		logLifecycleEvent("Data Invalidated");
 		if (mLayout == null || mAdapter == null) {
 			return;
 		}
-		shouldRecalculateScrollWhenComputingLayout = false;
+		shouldRecalculateScrollWhenComputingLayout = shouldRecalculateScrollPositions;
 		markAdapterDirty = true;
 		requestLayout();
 	}
@@ -278,7 +318,7 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 		}
 		Map<Object, FreeFlowItem> oldFrames = frames;
 
-		frames = new HashMap<Object, FreeFlowItem>();
+		frames = new LinkedHashMap<Object, FreeFlowItem>();
 		copyFrames(mLayout.getItemProxies(viewPortX, viewPortY), frames);
 		// Create a copy of the incoming values because the source
 		// layout may change the map inside its own class
@@ -290,8 +330,8 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 	}
 
 	/**
-	 * Copies the frames from one HashMap into another. The items are cloned
-	 * cause we modify the rectangles of the items as they are moving
+	 * Copies the frames from one LinkedHashMap into another. The items are
+	 * cloned cause we modify the rectangles of the items as they are moving
 	 */
 	protected void copyFrames(Map<Object, FreeFlowItem> srcFrames,
 			Map<Object, FreeFlowItem> destFrames) {
@@ -833,14 +873,13 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 				&& mLayout.getContentHeight() > getHeight()) {
 			canScroll = true;
 		}
-		
-		
+
 		switch (event.getAction()) {
 		case (MotionEvent.ACTION_DOWN):
 			touchDown(event);
 			break;
 		case (MotionEvent.ACTION_MOVE):
-			if(canScroll){
+			if (canScroll) {
 				touchMove(event);
 			}
 			break;
@@ -862,8 +901,6 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 		if (mVelocityTracker != null) {
 			mVelocityTracker.addMovement(event);
 		}
-
-		
 
 		return true;
 
@@ -918,7 +955,6 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 	}
 
 	protected void touchMove(MotionEvent event) {
-		
 		float xDiff = event.getX() - deltaX;
 		float yDiff = event.getY() - deltaY;
 
@@ -1004,8 +1040,8 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 	}
 
 	protected void touchUp(MotionEvent event) {
-		if ( (mTouchMode == TOUCH_MODE_SCROLL
-				|| mTouchMode == TOUCH_MODE_OVERFLING) && mVelocityTracker != null ) {
+		if ((mTouchMode == TOUCH_MODE_SCROLL || mTouchMode == TOUCH_MODE_OVERFLING)
+				&& mVelocityTracker != null) {
 
 			mVelocityTracker.computeCurrentVelocity(1000, maxFlingVelocity);
 
@@ -1048,7 +1084,14 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 			if (mTouchModeReset != null) {
 				removeCallbacks(mTouchModeReset);
 			}
-			if (beginTouchAt != null && beginTouchAt.view != null) {
+
+			FreeFlowItem endTouchAt = ViewUtils.getItemAt(frames,
+					(int) (viewPortX + event.getX()),
+					(int) (viewPortY + event.getY()));
+
+			if (beginTouchAt != null && beginTouchAt.view != null
+					&& beginTouchAt == endTouchAt) {
+
 				beginTouchAt.view.setPressed(true);
 
 				mTouchModeReset = new Runnable() {
@@ -1227,9 +1270,9 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 			}
 		}
 
-		HashMap<Object, FreeFlowItem> oldFrames = new HashMap<Object, FreeFlowItem>();
+		LinkedHashMap<Object, FreeFlowItem> oldFrames = new LinkedHashMap<Object, FreeFlowItem>();
 		copyFrames(frames, oldFrames);
-		frames = new HashMap<Object, FreeFlowItem>();
+		frames = new LinkedHashMap<Object, FreeFlowItem>();
 		copyFrames(mLayout.getItemProxies(viewPortX, viewPortY), frames);
 
 		LayoutChangeset changeSet = getViewChanges(oldFrames, frames, true);
