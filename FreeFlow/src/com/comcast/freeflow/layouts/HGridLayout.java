@@ -65,7 +65,7 @@ public class HGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 	public void prepareLayout() {
 		proxies.clear();
 
-		int rows = height / itemHeight;
+		int rows = (int) Math.ceil((double)height / (double)itemHeight);
 		int leftStart = 0;
 
 		for (int i = 0; i < itemsAdapter.getNumberOfSections(); i++) {
