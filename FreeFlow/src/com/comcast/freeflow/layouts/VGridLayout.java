@@ -184,6 +184,14 @@ public class VGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 		return (fd.frame.top + fd.frame.height());
 	}
 
+	@Override public int getItemWidth() {
+		return itemWidth;
+	}
+
+	@Override public int getItemHeight() {
+		return itemHeight;
+	}
+
 	@Override
 	public FreeFlowItem getFreeFlowItemForItem(Object data) {
 		return proxies.get(data);
@@ -212,9 +220,4 @@ public class VGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 		}
 		
 	}
-	
-	public int getItemWidth(){
-		return itemWidth;
-	}
-
 }

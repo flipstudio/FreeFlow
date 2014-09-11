@@ -88,6 +88,10 @@ public interface FreeFlowLayout {
 
 	public int getContentHeight();
 
+	public int getItemWidth();
+
+	public int getItemHeight();
+
 	public FreeFlowItem getItemAt(float x, float y);
 
 	public static class FreeFlowLayoutParams {

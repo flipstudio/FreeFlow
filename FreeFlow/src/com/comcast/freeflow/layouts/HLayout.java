@@ -168,6 +168,14 @@ public class HLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 		return height;
 	}
 
+	@Override public int getItemWidth() {
+		return itemWidth;
+	}
+
+	@Override public int getItemHeight() {
+		return -1;
+	}
+
 	@Override
 	public FreeFlowItem getFreeFlowItemForItem(Object data) {
 		return proxies.get(data);
