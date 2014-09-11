@@ -177,6 +177,14 @@ public class HGridLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 		return height;
 	}
 
+	@Override public int getItemWidth() {
+		return itemWidth;
+	}
+
+	@Override public int getItemHeight() {
+		return itemHeight;
+	}
+
 	@Override
 	public FreeFlowItem getFreeFlowItemForItem(Object data) {
 		return proxies.get(data);

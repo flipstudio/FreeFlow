@@ -15,16 +15,11 @@
  ******************************************************************************/
 package com.comcast.freeflow.layouts;
 
-import java.util.LinkedHashMap;
-
+import android.graphics.Rect;
 import com.comcast.freeflow.core.FreeFlowItem;
 import com.comcast.freeflow.core.Section;
-import com.comcast.freeflow.core.SectionedAdapter;
-import com.comcast.freeflow.layouts.FreeFlowLayout.FreeFlowLayoutParams;
-import com.comcast.freeflow.layouts.HLayout.LayoutParams;
 import com.comcast.freeflow.utils.ViewUtils;
-
-import android.graphics.Rect;
+import java.util.LinkedHashMap;
 
 public class VLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 
@@ -162,6 +157,14 @@ public class VLayout extends FreeFlowLayoutBase implements FreeFlowLayout {
 		FreeFlowItem fd = proxies.get(lastFrameData);
 
 		return (fd.frame.top + fd.frame.height());
+	}
+
+	@Override public int getItemWidth() {
+		return -1;
+	}
+
+	@Override public int getItemHeight() {
+		return itemHeight;
 	}
 
 	@Override
