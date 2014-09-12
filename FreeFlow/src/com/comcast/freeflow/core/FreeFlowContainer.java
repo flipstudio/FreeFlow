@@ -1875,6 +1875,22 @@ public class FreeFlowContainer extends AbsLayoutContainer {
 		}
 	}
 
+	public void scrollTo(float percentX, float percentY) {
+		if (mLayout == null || mAdapter == null) return;
+
+		float contentWidth = mLayout.getContentWidth();
+		float scrollableWidth = contentWidth - getWidth();
+
+		float contentHeight = mLayout.getContentHeight();
+		float scrollableHeight = contentHeight - getHeight();
+
+		if (scrollableWidth == 0f && scrollableHeight == 0f) return;
+
+		moveViewportBy(scrollableWidth * -percentX, scrollableHeight * -percentY, false);
+
+		invokeOnItemScrollListeners();
+	}
+
 	/**
 	 * Returns the percentage of width scrolled. The values range from 0 to 1
 	 * 
